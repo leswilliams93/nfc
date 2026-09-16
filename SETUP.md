@@ -189,13 +189,18 @@ submit will `POST` this JSON to it:
   "floor": "2",
   "room": "210",
   "code": "ZACH 210",
-  "issue": "Too Cold",
-  "description": "started this morning",
+  "issue": "Fume Hood Not Working",
+  "hood": "FH-3",
+  "description": "sash alarm sounding since this morning",
   "contact": "Les Williams",
   "photo": false,
   "submitted": "2026-09-16T14:42:03.114Z"
 }
 ```
+
+`hood` is populated only when the issue is **Fume Hood Not Working**; it is an
+empty string for every other issue type. `description` merges the "Other"
+free-text answer with the optional "anything else to add" note.
 
 That endpoint could be an AiM/TMA integration, a Power Automate flow, or a Google
 Apps Script writing to a Sheet. The page doesn't care.

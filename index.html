@@ -334,6 +334,13 @@
         </label>
       </div>
 
+      <div class="field hidden" id="hoodField">
+        <label for="hoodText">Which fume hood?</label>
+        <input type="text" id="hoodText" maxlength="40"
+               autocomplete="off" autocapitalize="characters" spellcheck="false"
+               placeholder="Hood number from the sticker or sash">
+      </div>
+
       <div class="field hidden" id="otherField">
         <label for="otherText">Describe the problem</label>
         <textarea id="otherText" placeholder="Tell us what you're seeing..." maxlength="500"></textarea>
@@ -378,6 +385,7 @@
       <div class="row ref"><span class="k">Reference</span><span class="v" id="rRef"></span></div>
       <div class="row"><span class="k">Location</span><span class="v" id="rLoc"></span></div>
       <div class="row"><span class="k">Issue</span><span class="v" id="rIssue"></span></div>
+      <div class="row" id="rHoodRow"><span class="k">Fume Hood</span><span class="v" id="rHood"></span></div>
       <div class="row" id="rDescRow"><span class="k">Details</span><span class="v" id="rDesc"></span></div>
       <div class="row" id="rPhotoRow"><span class="k">Photo</span><span class="v">Attached</span></div>
       <div class="row"><span class="k">Submitted</span><span class="v" id="rTime"></span></div>
@@ -441,15 +449,26 @@
     floor ? "Floor " + floor + " · Room " + room : "Room " + room;
   document.title = code + " — Report a Problem";
 
-  /* ---------- Show the "Other" box only when Other is picked ---------- */
+  /* ---------- Reveal the follow-up that matches the chosen issue ----------
+     Other            -> describe the problem (required)
+     Fume Hood        -> which hood (optional, but prompted)
+  ----------------------------------------------------------------------- */
   var otherField = document.getElementById("otherField");
   var otherText  = document.getElementById("otherText");
+  var hoodField  = document.getElementById("hoodField");
+  var hoodText   = document.getElementById("hoodText");
 
   document.getElementById("opts").addEventListener("change", function (e) {
     if (e.target.name !== "issue") return;
+
     var isOther = e.target.value === "Other";
+    var isHood  = e.target.value === "Fume Hood Not Working";
+
     otherField.classList.toggle("hidden", !isOther);
+    hoodField.classList.toggle("hidden", !isHood);
+
     if (isOther) otherText.focus();
+    if (isHood)  hoodText.focus();
     hideError();
   });
 
@@ -506,6 +525,10 @@
     var extra = document.getElementById("details").value.trim();
     var desc  = [free, extra].filter(Boolean).join(" — ");
 
+    /* Only carry the hood number if Fume Hood is the issue -- the field keeps
+       its value if someone types a hood then changes their mind. */
+    var hood = issue === "Fume Hood Not Working" ? hoodText.value.trim() : "";
+
     var now = new Date();
     var report = {
       ref:      makeRef(now),
@@ -515,6 +538,7 @@
       room:     room,
       code:     code,
       issue:    issue,
+      hood:     hood,
       description: desc,
       contact:  document.getElementById("contact").value.trim(),
       photo:    hasPhoto,
@@ -538,6 +562,9 @@
     document.getElementById("rLoc").textContent =
       r.code + (r.floor ? " (Floor " + r.floor + ")" : "");
     document.getElementById("rIssue").textContent = r.issue;
+
+    document.getElementById("rHood").textContent = r.hood;
+    document.getElementById("rHoodRow").style.display = r.hood ? "flex" : "none";
 
     document.getElementById("rDesc").textContent = r.description;
     document.getElementById("rDescRow").style.display = r.description ? "flex" : "none";
