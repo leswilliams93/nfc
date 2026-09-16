@@ -159,6 +159,18 @@
     margin-bottom: 6px;
   }
   .field .opt-note { font-weight: 400; color: var(--muted); }
+  .field .req {
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #fff;
+    background: var(--maroon);
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-left: 6px;
+    vertical-align: 1px;
+  }
   textarea, input[type="text"], input[type="tel"], input[type="email"] {
     width: 100%;
     font: inherit;
@@ -335,15 +347,16 @@
       </div>
 
       <div class="field hidden" id="hoodField">
-        <label for="hoodText">Which fume hood?</label>
-        <input type="text" id="hoodText" maxlength="40"
+        <label for="hoodText">Which fume hood? <span class="req">Required</span></label>
+        <input type="text" id="hoodText" maxlength="40" required aria-required="true"
                autocomplete="off" autocapitalize="characters" spellcheck="false"
                placeholder="Hood number from the sticker or sash">
       </div>
 
       <div class="field hidden" id="otherField">
-        <label for="otherText">Describe the problem</label>
-        <textarea id="otherText" placeholder="Tell us what you're seeing..." maxlength="500"></textarea>
+        <label for="otherText">Describe the problem <span class="req">Required</span></label>
+        <textarea id="otherText" required aria-required="true"
+                  placeholder="Tell us what you're seeing..." maxlength="500"></textarea>
       </div>
 
       <div class="field">
@@ -514,20 +527,27 @@
     if (!picked) return showError("Please choose an issue above.");
 
     var issue = picked.value;
-    var free  = otherText.value.trim();
+
+    var free = otherText.value.trim();
     if (issue === "Other" && free === "") {
       showError("Please describe the problem so we know what to send.");
       otherText.focus();
       return;
     }
-    hideError();
-
-    var extra = document.getElementById("details").value.trim();
-    var desc  = [free, extra].filter(Boolean).join(" — ");
 
     /* Only carry the hood number if Fume Hood is the issue -- the field keeps
        its value if someone types a hood then changes their mind. */
     var hood = issue === "Fume Hood Not Working" ? hoodText.value.trim() : "";
+    if (issue === "Fume Hood Not Working" && hood === "") {
+      showError("Please enter the fume hood number — we need it to know which hood to service.");
+      hoodText.focus();
+      return;
+    }
+
+    hideError();
+
+    var extra = document.getElementById("details").value.trim();
+    var desc  = [free, extra].filter(Boolean).join(" — ");
 
     var now = new Date();
     var report = {

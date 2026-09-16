@@ -198,8 +198,10 @@ submit will `POST` this JSON to it:
 }
 ```
 
-`hood` is populated only when the issue is **Fume Hood Not Working**; it is an
-empty string for every other issue type. `description` merges the "Other"
+`hood` is **required** when the issue is *Fume Hood Not Working* — the form will
+not submit without it — and is an empty string for every other issue type. So a
+report with `"issue": "Fume Hood Not Working"` is guaranteed to carry a non-empty
+`hood`, which makes it safe to key on downstream. `description` merges the "Other"
 free-text answer with the optional "anything else to add" note.
 
 That endpoint could be an AiM/TMA integration, a Power Automate flow, or a Google
