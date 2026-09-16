@@ -118,7 +118,12 @@
     cursor: pointer;
   }
   .opt .icon { font-size: 26px; line-height: 1; width: 32px; text-align: center; flex: none; }
-  .opt .text { font-size: 18px; font-weight: 600; flex: 1; }
+  .opt .text {
+    font-size: 17px;
+    font-weight: 600;
+    flex: 1;
+    line-height: 1.25;   /* longer labels wrap cleanly on narrow screens */
+  }
   .opt .tick {
     width: 24px; height: 24px; flex: none;
     border: 2px solid var(--line);
@@ -310,6 +315,18 @@
         <label class="opt">
           <input type="radio" name="issue" value="Water Leak">
           <span class="face"><span class="icon">&#128167;</span><span class="text">Water Leak</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="Fume Hood Not Working">
+          <span class="face"><span class="icon">&#127788;&#65039;</span><span class="text">Fume Hood Not Working</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="Autoclave Not Working">
+          <span class="face"><span class="icon">&#9832;&#65039;</span><span class="text">Autoclave Not Working</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="GFCI or Breaker Tripped">
+          <span class="face"><span class="icon">&#9889;&#65039;</span><span class="text">GFCI or Breaker Tripped</span><span class="tick"></span></span>
         </label>
         <label class="opt">
           <input type="radio" name="issue" value="Other">
