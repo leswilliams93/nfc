@@ -9,7 +9,7 @@ write a different URL to each card and the page adapts.
 ## The URL scheme
 
 ```
-https://YOURNAME.github.io/nfc/?b=ZACH&f=2&r=210
+https://leswilliams93.github.io/nfc/?b=ZACH&f=2&r=210
                                  │      │     └── room
                                  │      └──────── floor
                                  └─────────────── building abbreviation
@@ -30,7 +30,26 @@ Everything is optional — open the page with no parameters and it demos as ZACH
 
 ---
 
-## Part 1 — Put it online (about 10 minutes, one time)
+## Part 1 — Put it online ✅ DONE 2026-09-16
+
+**This is already live — skip to Part 2.**
+
+- Live site: **https://leswilliams93.github.io/nfc/**
+- Repo: **https://github.com/leswilliams93/nfc** (public, as free Pages requires)
+- Verified serving HTTP 200, byte-identical to the local `index.html`
+
+To change the page later, edit `index.html` here and push:
+
+```bash
+export PATH="/c/Users/leswilliams/.local/gh/bin:$PATH"
+git add index.html && git commit -m "Update form" && git push
+```
+
+The live site updates about a minute after the push. The original manual steps are
+kept below in case you ever need to rebuild this from scratch.
+
+<details>
+<summary>Original setup steps (already completed)</summary>
 
 You need a URL your phone can reach. GitHub Pages is free, permanent, and HTTPS,
 so the demo works on cell data and doesn't depend on your laptop being awake.
@@ -48,17 +67,26 @@ so the demo works on cell data and doesn't depend on your laptop being awake.
    - Under "Build and deployment", set Source = **Deploy from a branch**
    - Branch = **main**, folder = **/ (root)** → **Save**
 6. Wait 1–2 minutes, then reload that Settings → Pages screen. It will show:
-   **"Your site is live at https://YOURNAME.github.io/nfc/"**
+   **"Your site is live at https://leswilliams93.github.io/nfc/"**
 
 That's your base URL. Test it in your desktop browser first:
 
 ```
-https://YOURNAME.github.io/nfc/?b=ZACH&f=2&r=210
+https://leswilliams93.github.io/nfc/?b=ZACH&f=2&r=210
 ```
 
 > **Changing the page later:** go to the repo, click `index.html`, click the pencil
 > icon, edit, commit. The live site updates in about a minute. Or drag a new
 > `index.html` in via *Add file → Upload files* to replace it wholesale.
+
+</details>
+
+> **Don't bother trying a local server as a shortcut.** Running
+> `python -m http.server` on the TAMU laptop works in the laptop's own browser but
+> is unreachable from a phone: Windows Firewall has Group-Policy Block rules for
+> `python.exe` inbound on the Domain profile, all profiles default to BlockInbound,
+> and the shell isn't admin. Block rules beat Allow rules in Windows Firewall, so a
+> port exception wouldn't help even with admin. This was tested and confirmed.
 
 ---
 
@@ -88,7 +116,7 @@ needed to read them.** You only need an app to *write* the card once.
 1. Install **NFC Tools** by wakdev from the App Store (free version is enough).
 2. Open it → **Write** tab → **Add a record** → **URL / URI**.
 3. Type the full URL for that room:
-   `https://YOURNAME.github.io/nfc/?b=ZACH&f=2&r=210`
+   `https://leswilliams93.github.io/nfc/?b=ZACH&f=2&r=210`
 4. Tap **OK** → **Write / X records**.
 5. Hold the top edge of the phone flat against the card until it confirms.
 6. Repeat per room, changing only `b`, `f`, and `r`.
