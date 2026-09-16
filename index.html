@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#500000">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
+<title>Report a Problem &mdash; Facilities Services</title>
+<style>
+  :root {
+    --maroon: #500000;
+    --maroon-dark: #3a0000;
+    --maroon-tint: #f6efef;
+    --ink: #1a1a1a;
+    --muted: #6b6b6b;
+    --line: #dcdcdc;
+    --bg: #ffffff;
+    --ok: #1f7a3d;
+  }
+
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.45;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* ---------- Header ---------- */
+  header {
+    background: var(--maroon);
+    color: #fff;
+    padding: calc(env(safe-area-inset-top) + 22px) 20px 22px;
+    text-align: center;
+  }
+  header .eyebrow {
+    font-size: 12px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    opacity: .8;
+    margin: 0 0 6px;
+  }
+  header h1 {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.1;
+    font-weight: 700;
+    letter-spacing: -.01em;
+  }
+
+  main {
+    padding: 20px 20px calc(env(safe-area-inset-bottom) + 40px);
+    max-width: 560px;
+    margin: 0 auto;
+  }
+
+  /* ---------- Location card ---------- */
+  .location {
+    border: 2px solid var(--maroon);
+    border-radius: 14px;
+    padding: 16px 18px;
+    background: var(--maroon-tint);
+    margin-bottom: 26px;
+  }
+  .location .label {
+    font-size: 11px;
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--maroon);
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .location .code {
+    font-size: 27px;
+    font-weight: 800;
+    color: var(--maroon);
+    letter-spacing: -.01em;
+    line-height: 1.15;
+  }
+  .location .bldg { font-size: 15px; color: #4a3c3c; margin-top: 3px; }
+  .location .floor { font-size: 14px; color: var(--muted); margin-top: 2px; }
+
+  /* ---------- Question ---------- */
+  h2 {
+    font-size: 20px;
+    font-weight: 700;
+    margin: 0 0 4px;
+  }
+  .hint { color: var(--muted); font-size: 14px; margin: 0 0 14px; }
+
+  /* ---------- Issue options ---------- */
+  .options { display: flex; flex-direction: column; gap: 10px; margin-bottom: 22px; }
+
+  .opt { position: relative; display: block; }
+  .opt input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .opt .face {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-height: 62px;
+    padding: 12px 16px;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    background: #fff;
+    transition: border-color .12s, background .12s;
+    cursor: pointer;
+  }
+  .opt .icon { font-size: 26px; line-height: 1; width: 32px; text-align: center; flex: none; }
+  .opt .text { font-size: 18px; font-weight: 600; flex: 1; }
+  .opt .tick {
+    width: 24px; height: 24px; flex: none;
+    border: 2px solid var(--line);
+    border-radius: 50%;
+    position: relative;
+  }
+  .opt input:checked + .face {
+    border-color: var(--maroon);
+    background: var(--maroon-tint);
+  }
+  .opt input:checked + .face .tick {
+    border-color: var(--maroon);
+    background: var(--maroon);
+  }
+  .opt input:checked + .face .tick::after {
+    content: "";
+    position: absolute;
+    left: 6px; top: 2px;
+    width: 6px; height: 11px;
+    border: solid #fff;
+    border-width: 0 2.5px 2.5px 0;
+    transform: rotate(45deg);
+  }
+  .opt input:focus-visible + .face { outline: 3px solid #9b5c5c; outline-offset: 2px; }
+
+  /* ---------- Fields ---------- */
+  .field { margin-bottom: 18px; }
+  .field.hidden { display: none; }
+  .field label, .field .flabel {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .field .opt-note { font-weight: 400; color: var(--muted); }
+  textarea, input[type="text"], input[type="tel"], input[type="email"] {
+    width: 100%;
+    font: inherit;
+    font-size: 17px; /* >=16px prevents iOS auto-zoom */
+    padding: 12px 14px;
+    border: 2px solid var(--line);
+    border-radius: 12px;
+    background: #fff;
+    color: var(--ink);
+    -webkit-appearance: none;
+  }
+  textarea { min-height: 110px; resize: vertical; }
+  textarea:focus, input:focus { border-color: var(--maroon); outline: none; }
+
+  /* ---------- Photo ---------- */
+  .photo-btn {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    width: 100%; min-height: 52px;
+    border: 2px dashed var(--line);
+    border-radius: 12px;
+    background: #fff;
+    font: inherit; font-size: 16px; font-weight: 600;
+    color: var(--maroon);
+    cursor: pointer;
+  }
+  #photoInput { display: none; }
+  #photoPreview { margin-top: 10px; display: none; }
+  #photoPreview img {
+    width: 100%; max-height: 240px; object-fit: cover;
+    border-radius: 12px; border: 2px solid var(--line);
+    display: block;
+  }
+  #photoPreview button {
+    margin-top: 8px; background: none; border: none;
+    color: var(--maroon); font: inherit; font-size: 14px;
+    font-weight: 600; text-decoration: underline; padding: 6px 0;
+    cursor: pointer;
+  }
+
+  /* ---------- Submit ---------- */
+  .error {
+    display: none;
+    background: #fdecec;
+    border: 1px solid #e5a3a3;
+    color: #8a1c1c;
+    border-radius: 10px;
+    padding: 11px 14px;
+    font-size: 15px;
+    margin-bottom: 14px;
+  }
+  .error.show { display: block; }
+
+  button.submit {
+    width: 100%;
+    min-height: 56px;
+    background: var(--maroon);
+    color: #fff;
+    border: none;
+    border-radius: 14px;
+    font: inherit;
+    font-size: 19px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  button.submit:active { background: var(--maroon-dark); }
+  button.submit[disabled] { opacity: .6; }
+
+  /* ---------- Footer ---------- */
+  footer {
+    border-top: 1px solid var(--line);
+    margin-top: 28px;
+    padding-top: 18px;
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+  }
+  footer strong { color: var(--ink); display: block; font-size: 14px; margin-bottom: 4px; }
+
+  /* ---------- Confirmation ---------- */
+  #confirm { display: none; text-align: center; padding-top: 16px; }
+  #confirm .check {
+    width: 78px; height: 78px; border-radius: 50%;
+    background: var(--ok); margin: 0 auto 20px;
+    position: relative;
+  }
+  #confirm .check::after {
+    content: "";
+    position: absolute; left: 26px; top: 18px;
+    width: 18px; height: 34px;
+    border: solid #fff; border-width: 0 5px 5px 0;
+    transform: rotate(45deg);
+  }
+  #confirm h2 { font-size: 25px; margin-bottom: 8px; }
+  #confirm .lead { color: var(--muted); margin: 0 0 24px; font-size: 16px; }
+  .receipt {
+    text-align: left;
+    border: 2px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+  }
+  .receipt .row {
+    display: flex; justify-content: space-between; gap: 16px;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    font-size: 15px;
+  }
+  .receipt .row:last-child { border-bottom: none; }
+  .receipt .k { color: var(--muted); flex: none; }
+  .receipt .v { font-weight: 600; text-align: right; word-break: break-word; }
+  .receipt .row.ref { background: var(--maroon-tint); }
+  .receipt .row.ref .v { color: var(--maroon); font-weight: 800; }
+  #confirm .again {
+    margin-top: 22px; background: none;
+    border: 2px solid var(--maroon); color: var(--maroon);
+    border-radius: 14px; min-height: 52px; width: 100%;
+    font: inherit; font-size: 17px; font-weight: 700; cursor: pointer;
+  }
+  .demo-note {
+    margin-top: 20px; font-size: 12px; color: var(--muted);
+    background: #f5f5f5; border-radius: 10px; padding: 10px 12px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="eyebrow">Facilities Services</p>
+  <h1 id="hdr">Report a Problem</h1>
+</header>
+
+<main>
+  <!-- ============ FORM ============ -->
+  <div id="formScreen">
+    <div class="location">
+      <div class="label">Location</div>
+      <div class="code" id="locCode">&mdash;</div>
+      <div class="bldg" id="locBldg"></div>
+      <div class="floor" id="locFloor"></div>
+    </div>
+
+    <h2>What's the issue?</h2>
+    <p class="hint">Choose the one that fits best.</p>
+
+    <form id="wo" novalidate>
+      <div class="options" id="opts">
+        <label class="opt">
+          <input type="radio" name="issue" value="Too Hot">
+          <span class="face"><span class="icon">&#128293;</span><span class="text">Too Hot</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="Too Cold">
+          <span class="face"><span class="icon">&#10052;&#65039;</span><span class="text">Too Cold</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="Water Leak">
+          <span class="face"><span class="icon">&#128167;</span><span class="text">Water Leak</span><span class="tick"></span></span>
+        </label>
+        <label class="opt">
+          <input type="radio" name="issue" value="Other">
+          <span class="face"><span class="icon">&#128221;</span><span class="text">Other</span><span class="tick"></span></span>
+        </label>
+      </div>
+
+      <div class="field hidden" id="otherField">
+        <label for="otherText">Describe the problem</label>
+        <textarea id="otherText" placeholder="Tell us what you're seeing..." maxlength="500"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="details">Anything else to add? <span class="opt-note">(optional)</span></label>
+        <textarea id="details" placeholder="Optional details &mdash; e.g. &ldquo;started this morning&rdquo;" maxlength="500" style="min-height:80px"></textarea>
+      </div>
+
+      <div class="field">
+        <div class="flabel">Add a photo <span class="opt-note">(optional)</span></div>
+        <button type="button" class="photo-btn" id="photoBtn">&#128247;&nbsp; Take or choose a photo</button>
+        <input type="file" id="photoInput" accept="image/*">
+        <div id="photoPreview"><img alt="Photo preview"><button type="button" id="photoClear">Remove photo</button></div>
+      </div>
+
+      <div class="field">
+        <label for="contact">Your name or phone <span class="opt-note">(optional &mdash; if we need to follow up)</span></label>
+        <input type="text" id="contact" autocomplete="name" placeholder="Optional">
+      </div>
+
+      <div class="error" id="err"></div>
+
+      <button type="submit" class="submit">Submit Report</button>
+    </form>
+
+    <footer>
+      <strong>Facilities Services</strong>
+      We're here to help keep campus safe and working well.<br>
+      Your report goes directly to our team. Thank you!
+    </footer>
+  </div>
+
+  <!-- ============ CONFIRMATION ============ -->
+  <div id="confirm">
+    <div class="check"></div>
+    <h2>Report Received</h2>
+    <p class="lead">Thanks! Our team has what they need.</p>
+
+    <div class="receipt">
+      <div class="row ref"><span class="k">Reference</span><span class="v" id="rRef"></span></div>
+      <div class="row"><span class="k">Location</span><span class="v" id="rLoc"></span></div>
+      <div class="row"><span class="k">Issue</span><span class="v" id="rIssue"></span></div>
+      <div class="row" id="rDescRow"><span class="k">Details</span><span class="v" id="rDesc"></span></div>
+      <div class="row" id="rPhotoRow"><span class="k">Photo</span><span class="v">Attached</span></div>
+      <div class="row"><span class="k">Submitted</span><span class="v" id="rTime"></span></div>
+    </div>
+
+    <button class="again" id="again">Submit Another Report</button>
+    <p class="demo-note">Prototype: this report was recorded on this device only. No work order was created in the maintenance system.</p>
+  </div>
+</main>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =====================================================================
+     CONFIG
+     ---------------------------------------------------------------------
+     endpoint: leave null for the prototype (confirmation only, nothing
+       leaves the phone). Set it to a URL later and each submit will POST
+       JSON there -- that's the single hook to a real work-order system.
+
+     buildings: abbreviation -> full name, so the NFC URL stays tiny.
+       NTAG213 cards hold ~132 bytes of URL, so short params matter.
+       VERIFY / EXTEND this list for your buildings.
+     ===================================================================== */
+  var CONFIG = {
+    endpoint: null,
+    buildings: {
+      ZACH:  "Zachry Engineering Education Complex",
+      MSC:   "Memorial Student Center",
+      EVANS: "Evans Library"
+    }
+  };
+
+  /* ---------- Read location from the URL ---------------------------------
+     Short form (use this on the cards):  ?b=ZACH&f=2&r=210
+     Optional overrides:
+       bn=Full+Building+Name   spell out a building not in the list above
+       c=ZACH-2-210            override the big code line entirely
+     Defaults to ZACH 210 so the page still demos if opened bare.
+  ----------------------------------------------------------------------- */
+  var q = new URLSearchParams(location.search);
+  function p() {
+    for (var i = 0; i < arguments.length; i++) {
+      var v = q.get(arguments[i]);
+      if (v !== null && v.trim() !== "") return v.trim();
+    }
+    return "";
+  }
+
+  var abbr  = p("b", "bldg", "building") || "ZACH";
+  var room  = p("r", "room")             || "210";
+  var floor = p("f", "floor");
+  var name  = p("bn", "name") || CONFIG.buildings[abbr.toUpperCase()] || "";
+  var code  = p("c", "code") || (abbr + " " + room);
+
+  var locCode = document.getElementById("locCode");
+  locCode.textContent = code;
+  document.getElementById("locBldg").textContent = name;
+  document.getElementById("locFloor").textContent =
+    floor ? "Floor " + floor + " · Room " + room : "Room " + room;
+  document.title = code + " — Report a Problem";
+
+  /* ---------- Show the "Other" box only when Other is picked ---------- */
+  var otherField = document.getElementById("otherField");
+  var otherText  = document.getElementById("otherText");
+
+  document.getElementById("opts").addEventListener("change", function (e) {
+    if (e.target.name !== "issue") return;
+    var isOther = e.target.value === "Other";
+    otherField.classList.toggle("hidden", !isOther);
+    if (isOther) otherText.focus();
+    hideError();
+  });
+
+  /* ---------- Photo (optional) ---------- */
+  var photoInput   = document.getElementById("photoInput");
+  var photoPreview = document.getElementById("photoPreview");
+  var photoImg     = photoPreview.querySelector("img");
+  var hasPhoto     = false;
+
+  document.getElementById("photoBtn").addEventListener("click", function () {
+    photoInput.click();
+  });
+  photoInput.addEventListener("change", function () {
+    var f = photoInput.files && photoInput.files[0];
+    if (!f) return;
+    photoImg.src = URL.createObjectURL(f);
+    photoPreview.style.display = "block";
+    hasPhoto = true;
+  });
+  document.getElementById("photoClear").addEventListener("click", function () {
+    photoInput.value = "";
+    photoPreview.style.display = "none";
+    hasPhoto = false;
+  });
+
+  /* ---------- Errors ---------- */
+  var err = document.getElementById("err");
+  function showError(msg) {
+    err.textContent = msg;
+    err.classList.add("show");
+    err.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  function hideError() { err.classList.remove("show"); }
+
+  /* ---------- Submit ---------- */
+  var formScreen = document.getElementById("formScreen");
+  var confirmScreen = document.getElementById("confirm");
+
+  document.getElementById("wo").addEventListener("submit", function (e) {
+    e.preventDefault();
+
+    var picked = document.querySelector('input[name="issue"]:checked');
+    if (!picked) return showError("Please choose an issue above.");
+
+    var issue = picked.value;
+    var free  = otherText.value.trim();
+    if (issue === "Other" && free === "") {
+      showError("Please describe the problem so we know what to send.");
+      otherText.focus();
+      return;
+    }
+    hideError();
+
+    var extra = document.getElementById("details").value.trim();
+    var desc  = [free, extra].filter(Boolean).join(" — ");
+
+    var now = new Date();
+    var report = {
+      ref:      makeRef(now),
+      building: abbr,
+      buildingName: name,
+      floor:    floor,
+      room:     room,
+      code:     code,
+      issue:    issue,
+      description: desc,
+      contact:  document.getElementById("contact").value.trim(),
+      photo:    hasPhoto,
+      submitted: now.toISOString()
+    };
+
+    save(report);
+    if (CONFIG.endpoint) post(report);
+    render(report, now);
+  });
+
+  function makeRef(d) {
+    var pad = function (n) { return String(n).padStart(2, "0"); };
+    var stamp = String(d.getFullYear()).slice(2) + pad(d.getMonth() + 1) + pad(d.getDate());
+    var rand = String(Math.floor(Math.random() * 9000) + 1000);
+    return "WO-" + stamp + "-" + rand;
+  }
+
+  function render(r, d) {
+    document.getElementById("rRef").textContent = r.ref;
+    document.getElementById("rLoc").textContent =
+      r.code + (r.floor ? " (Floor " + r.floor + ")" : "");
+    document.getElementById("rIssue").textContent = r.issue;
+
+    document.getElementById("rDesc").textContent = r.description;
+    document.getElementById("rDescRow").style.display = r.description ? "flex" : "none";
+    document.getElementById("rPhotoRow").style.display = r.photo ? "flex" : "none";
+
+    document.getElementById("rTime").textContent = d.toLocaleString([], {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit"
+    });
+
+    formScreen.style.display = "none";
+    confirmScreen.style.display = "block";
+    document.getElementById("hdr").textContent = "Thank You";
+    window.scrollTo(0, 0);
+  }
+
+  /* Keep a local log so you can show a history during the demo:
+     open Safari console and run  JSON.parse(localStorage.woReports)  */
+  function save(r) {
+    try {
+      var all = JSON.parse(localStorage.getItem("woReports") || "[]");
+      all.push(r);
+      localStorage.setItem("woReports", JSON.stringify(all.slice(-50)));
+    } catch (_) { /* private browsing -- ignore */ }
+  }
+
+  function post(r) {
+    fetch(CONFIG.endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(r)
+    }).catch(function () { /* prototype: fail silently */ });
+  }
+
+  document.getElementById("again").addEventListener("click", function () {
+    location.href = location.pathname + location.search;
+  });
+})();
+</script>
+</body>
+</html>
